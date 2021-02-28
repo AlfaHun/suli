@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title></title>
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<style>
+* {
+ font-family: Arial;
+}
+	  
+      .answerbutton {
+		  width:150px;
+		  height: 80px;
+		  margin-left: 20px;
+		  font-size:50px;
+		  background-color: yellow;
+	  }
+	  
+	  .newbutton {
+		  width:150px;
+		  height: 50px;
+		  margin-left: 20px;
+	  }
+	  
+	  .nextbutton {
+		  width:150px;
+		  height: 50px;
+	  }
+	  
+	  .statlabel {
+		font-size: 22px;
+		font-weight: bold;
+		padding-left: 20px;
+	  }
+	  
+	   .numlabel {
+		font-size: 60px;
+		font-weight: bold;
+		text-align: center;
+		background-color: #f1edcc;
+		width: 250px;
+	  }
+	  
+	  
+	  
+	  table, th, td {
+            // border: 1px solid black;
+			border: 0px;
+         }
+	  
+	  .col1 {
+		background-color: #a1edcc;
+		width: 200px;
+		height: 150px;
+		font-size: 80px;
+		text-align: center;
+		font-weight: bold;
+	  }
+	  
+	  .col2 {
+		background-color: #eeeeee;
+		width: 100px;
+		height: 150px;
+		font-size: 50px;
+		text-align: center;
+		font-weight: bold;
+	  }
+	  
+	  .col3 {
+		background-color: #ffffff;
+		width: 200px;
+		height: 150px;
+		font-size: 50px;
+		text-align: center;
+		font-weight: bold;
+		border: 1px solid black;
+	  }
+	  
+	  .settingsTable {
+		//border: 1px solid black;
+		font-size: 22px;
+	  }
+	  
+	  .settingsTable td {
+	  border: 1px solid black;
+	  }
+</style>
+
+<body>
+
+<table>
+<tr>
+	<td colspan="5">
+	<h2>SZORZÓTÁBLA GYAKORLÁS ÁRONNAK</h2>
+	</td>
+</tr>
+<tr>	
+	<td class="col1">
+	<label id="number1"></label>
+	</td>
+	<td class="col2">
+	<label>*</label> 
+	</td>
+	<td class="col1">
+	<label id="number2"></label>
+	</td>
+	<td class="col2">
+	<label>=</label> 
+	</td>
+	<td id="column5" class="col3">
+	<label id="number3"></label>
+	</td>
+<tr>
+</table>
+
+<table style="margin-top: 15px;margin-bottom:20px;">
+<tr>
+<td>
+<button id="button1" class="answerbutton" onclick="answerBtuttonClick(this)"></button>	
+</td>
+<td>
+<button id="button2" class="answerbutton" onclick="answerBtuttonClick(this)"></button>	
+</td>
+<td>
+<button id="button3" class="answerbutton" onclick="answerBtuttonClick(this)"></button>	
+</td>
+<td>
+<button id="button4" class="answerbutton" onclick="answerBtuttonClick(this)"></button>
+</td>
+
+</tr>
+<tr>
+<td colspan="4" align="center" style="padding-top:10px;">
+<label class="statlabel" style="color:lightgreen">JÓ: </label><label id="lblStatGood" class="statlabel"></label>
+		<button id="buttonNext" class="newbutton" onclick="nextQuestion()">KÖVETKEZŐ</button>	
+		
+	<label class="statlabel" style="color:red">ROSSZ: </label><label id="lblStatBad" class="statlabel"></label>
+
+</td>
+
+</tr>
+
+</table>
+
+
+<table class="settingsTable">
+<tr>
+<td>
+  <input type="checkbox" id="soundChk">
+  <label for="vehicle1">Hang</label>
+  <br>
+  <input type="checkbox" id="autoNextChk">
+  <label for="vehicle1">Köv.</label>
+</td>
+<td>
+  <input type="checkbox" id="szorzo1Chk">
+  <label for="vehicle1">1</label>
+  <input type="checkbox" id="szorzo2Chk" checked="checked">
+  <label for="vehicle1">2</label>
+  <input type="checkbox" id="szorzo3Chk">
+  <label for="vehicle1">3</label>
+  <input type="checkbox" id="szorzo4Chk" checked="checked">
+  <label for="vehicle1">4</label>
+  <input type="checkbox" id="szorzo5Chk" checked="checked">
+  <label for="vehicle1">5</label>
+  <input type="checkbox" id="szorzo6Chk">
+  <label for="vehicle1">6</label>
+  <input type="checkbox" id="szorzo7Chk">
+  <label for="vehicle1">7</label>
+  <input type="checkbox" id="szorzo8Chk" checked="checked">
+  <label for="vehicle1">8</label>
+  <input type="checkbox" id="szorzo9Chk">
+  <label for="vehicle1">9</label>
+  <input type="checkbox" id="szorzo10Chk">
+  <label for="vehicle1">10</label>
+  
+</td>
+<td>
+<button id="startNewTestBtn" class="nextbutton" onclick="startNewTest(false)">ÚJ TESZT</button>	
+</td>
+<td>
+<button id="startNewTestBtn2" class="nextbutton" onclick="startNewTest(true)">HIBÁSAK GYAKORLÁSA</button>	
+</td>
+</tr>
+</table>
+
+<table id="badAnswerTable">
+
+
+</table>
+
+</body>
+
+<script>
+
+let btns = [];  
+let lblNumber1;
+let lblNumber2;
+let lblNumber3;
+let answered = false;
+
+let qData = { num1: 0, num2: 0, goodanswer: 0, goodAnswerCount: 0, badAnswerCount: 0 }
+
+//let numbers1 = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+//let numbers2 = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+let numbers1 = [ 2, 4, 5, 8 ];
+let numbers2 = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
+
+let fullnumbers = [];
+let numIdx = 0;
+
+let badAnswers = [];
+
+
+var audio1 = new Audio('tada.mp3');
+var audio2 = new Audio('fail.mp3');
+
+$(document).ready(function() {
+	lblNumber1 = document.getElementById("number1");
+    lblNumber2 = document.getElementById("number2");
+    lblNumber3 = document.getElementById("number3");
+ 
+	btns[0] = document.getElementById("button1");
+	btns[1] = document.getElementById("button2");
+	btns[2] = document.getElementById("button3");
+	btns[3] = document.getElementById("button4");
+ 
+	startNewTest(false);
+ 
+	audio1.load();
+	audio2.load(); 
+});
+   
+function startNewTest(useBadAnswers) {
+	answered = false;
+	numIdx = 0;
+	
+	qData.goodAnswerCount = 0;
+	qData.badAnswerCount = 0;
+	$("#badAnswerTable tr").remove(); 
+	showStat();
+	
+	numbers1 = [];
+	for(i=1;i<=10;i++) {
+	  if (isChecked("#szorzo" + i + "Chk"))
+	  numbers1.push(i);
+	}
+	
+	shuffleArray(numbers1);
+	shuffleArray(numbers2);
+	
+	fullnumbers = [];
+	
+	if (useBadAnswers == false) {
+	  let ii = 0;
+    	for (i=0;i < numbers1.length;i++)
+		for(j=0; j < numbers2.length;j++)
+		{
+			if ((Math.floor(Math.random() * 2)) == 0) {
+			fullnumbers[ii] = { n1: numbers1[i], n2: numbers2[j] };
+			ii++;
+			}
+			else {
+		     fullnumbers[ii] = { n1: numbers2[j], n2: numbers1[i] };
+			ii++;
+			}
+		}
+	}
+	else {
+	   fullnumbers = badAnswers;
+	   badAnswers = [];
+	}
+		
+	shuffleArray(fullnumbers);
+	
+	for(i=0; i < 4;i++) {
+		btns[i].disabled = false;	
+    }
+	
+	//document.getElementById("buttonNewTest").disabled = true;
+	nextQuestion();
+}
+
+function endTest() {
+	document.getElementById("buttonNext").disabled = true;
+	
+	for(i=0; i < 4;i++) {		
+		btns[i].innerHTML = '';		
+		btns[i].disabled = true;
+    }
+	
+	lblNumber1.innerHTML = '';
+	lblNumber2.innerHTML = '';
+	lblNumber3.innerHTML = '';
+}
+
+function nextQuestion() {
+	answered = false;
+	
+	if (numIdx >= fullnumbers.length) {
+		endTest();
+		return;
+	}
+		
+	qData.num1 = fullnumbers[numIdx].n1;
+	qData.num2 = fullnumbers[numIdx].n2;
+	numIdx++;
+	qData.goodanswer = qData.num1 * qData.num2;
+	
+	lblNumber1.innerHTML = qData.num1;
+	lblNumber2.innerHTML = qData.num2;
+	lblNumber3.innerHTML = '';
+  
+	// let goodAnswerIndex = Math.floor(Math.random() * 4)
+
+	rAnswers = getRadnomAnswers(qData.num1 * qData.num2);
+	//let answer = 0;
+	for(i=0; i < 4;i++) {		
+		btns[i].innerHTML = rAnswers[i];		
+    }
+
+	document.getElementById("column5").style.backgroundColor = "";
+	document.getElementById("buttonNext").disabled = true;
+}
+
+function answerBtuttonClick(btn) {
+	let answer = btn.innerHTML;
+	lblNumber3.innerHTML = answer;
+	
+	if (answer == qData.goodanswer) {
+		if (!answered)
+		   qData.goodAnswerCount++;
+		   
+		document.getElementById("column5").style.backgroundColor = "lightgreen";
+		playOK();
+	}
+	else {
+		if (!answered) {
+		    qData.badAnswerCount++;
+			registerBadAnswer(qData.num1, qData.num2);
+		    // badAnswers.push({ n1: qData.num1, n2: qData.num2 });
+		}
+		
+		document.getElementById("column5").style.backgroundColor = "red";
+		playFail();
+	}
+	
+	answered = true;
+	
+	showStat();
+	
+	if (isChecked("#autoNextChk")) {
+		setTimeout(nextQuestion, 1500);
+	}
+	else {
+		document.getElementById("buttonNext").disabled = false;
+	}
+}
+
+function getRadnomAnswers(goodAnswer) {
+
+var arr = [];
+let goodAnswerIndex = Math.floor(Math.random() * 4)
+while(arr.length < 4){
+if (arr.length == goodAnswerIndex) {
+	arr.push(goodAnswer);
+}
+else {
+    var r = Math.floor(Math.random() * 100) + 1;
+    if (arr.indexOf(r) === -1 && r != goodAnswer) 
+	arr.push(r);
+	}
+	}
+	return arr;
+}
+
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
+function registerBadAnswer(num1, num2) {
+
+badAnswers.push({ n1: num1, n2: num2 });
+
+var table = document.getElementById("badAnswerTable");
+
+// Create an empty <tr> element and add it to the 1st position of the table:
+var row = table.insertRow(0);
+
+// Insert new cells (<td> elements) at the 1st and 2nd position of the "new" <tr> element:
+var cell1 = row.insertCell(0);
+//var cell2 = row.insertCell(1);
+
+// Add some text to the new cells:
+cell1.innerHTML = num1 + "*" + num2;
+// cell2.innerHTML = "NEW CELL2";
+
+}
+
+function showStat() {
+	document.getElementById("lblStatGood").innerHTML = qData.goodAnswerCount;
+	document.getElementById("lblStatBad").innerHTML = qData.badAnswerCount;
+}
+
+function playOK() {
+	if (soundIsEnabled())
+		audio1.play();
+}
+
+function playFail() {
+	if (soundIsEnabled())
+		audio2.play();
+}
+
+function soundIsEnabled() {
+  var x=$("#soundChk").is(":checked");
+
+  return x;
+}
+
+function isChecked(chkBox) {
+ return $(chkBox).is(":checked");
+
+}
+
+</script>
+</html>

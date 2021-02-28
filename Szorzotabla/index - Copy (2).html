@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title></title>
+</head>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<style>
+* {
+ font-family: Arial;
+}
+
+	#boxes {
+        content: "";
+        display: table;
+        clear: both;
+      }
+	  
+      .samplediv {
+        float: left;
+        height: 150px;
+        // width: 50%;
+        padding: 0 0px;
+		font-size: 45px;
+      }
+      #column1 {
+        background-color: #a1edcc;
+		width: 250px;
+		// align: center;
+      }
+      #column2 {
+        background-color: #eeeeee;  // #a0e9ed;
+        width: 90px;
+		font-size: 55px;
+      }
+      #column3 {
+        background-color: #f497f1;
+		width: 250px;
+      }
+	  #column4 {
+        background-color: #ffffff;
+		width: 90px;
+      }
+	   #column5 {
+        background-color: #ffffff;
+		width: 200px;
+		border-style: solid;
+      }
+	  
+      h2 {
+        color: #000000;
+        text-align: center;
+      }
+	  
+	  #buttonsdiv {
+	    padding-top: 40px;
+		padding-left: 20px;
+		padding-bottom: 40px;
+		width: 700px;
+		clear: both;
+	  }
+	  
+	  #newButtonDiv {
+	    padding-top: 20px;
+		text-align: center;
+	  }
+	  
+	  .answerbutton {
+		  width:150px;
+		  height: 80px;
+		  margin-left: 20px;
+		  font-size:50px;
+		  background-color: yellow;
+	  }
+	  
+	  .newbutton {
+		  width:150px;
+		  height: 50px;
+		  margin-left: 20px;
+	  }
+	  
+	  .statlabel {
+		font-size: 22px;
+		font-weight: bold;
+		padding-left: 20px;
+	  }
+	  
+	  
+	   .numlabel {
+		font-size: 60px;
+		font-weight: bold;
+		text-align: center;
+		background-color: #f1edcc;
+		width: 250px;
+	  }
+	  
+</style>
+
+<body>
+
+<main id="boxes">
+      <h2>SZORZÓTÁBLA GYAKORLÁS ÁRONNAK</h2>
+      <div id="column1" class="samplediv">
+        <h2 id="number1"></h2>
+      </div>
+      <div id="column2" class="samplediv">
+        <h2>*</h2> 
+      </div>
+      <div id="column3" class="samplediv">
+        <h2 id="number2"></h2> 
+      </div>
+	  <div id="column4" class="samplediv">
+        <h2>=</h2> 
+      </div>
+	  <div id="column5" class="samplediv">
+        <h2 id="number3"></h2> 
+      </div>
+</main>
+<div id="buttonsdiv">
+	<button id="button1" class="answerbutton" onclick="answerBtuttonClick(this)">1</button>	
+	<button id="button2" class="answerbutton" onclick="answerBtuttonClick(this)">2</button>	
+	<button id="button3" class="answerbutton" onclick="answerBtuttonClick(this)">3</button>	
+	<button id="button4" class="answerbutton" onclick="answerBtuttonClick(this)">4</button>
+
+	<div id="newButtonDiv">
+	<label class="statlabel" style="color:lightgreen">JÓ: </label><label id="lblStatGood" class="statlabel"></label>
+		<button id="buttonNext" class="newbutton" onclick="nextQuestion()">KÖVETKEZŐ</button>	
+		<button id="buttonNewTest" class="newbutton" onclick="startNewTest()">ÚJ TESZT</button>	
+	<label class="statlabel" style="color:red">ROSSZ: </label><label id="lblStatBad" class="statlabel"></label>
+	</div>
+</div>
+</body>
+
+<script>
+
+let btns = [];  
+let lblNumber1;
+let lblNumber2;
+let lblNumber3;
+let answered = false;
+
+let qData = { num1: 0, num2: 0, goodanswer: 0, goodAnswerCount: 0, badAnswerCount: 0 }
+
+//let numbers1 = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+//let numbers2 = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+let numbers1 = [ 2, 4, 5, 8 ];
+let numbers2 = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ];
+
+let fullnumbers = [];
+let numIdx = 0;
+
+
+
+var audio1 = new Audio('tada.wav');
+var audio2 = new Audio('fail.wav');
+
+$(document).ready(function() {
+	lblNumber1 = document.getElementById("number1");
+    lblNumber2 = document.getElementById("number2");
+    lblNumber3 = document.getElementById("number3");
+ 
+	btns[0] = document.getElementById("button1");
+	btns[1] = document.getElementById("button2");
+	btns[2] = document.getElementById("button3");
+	btns[3] = document.getElementById("button4");
+ 
+	startNewTest();
+ 
+	audio1.load();
+	audio2.load(); 
+});
+   
+function startNewTest() {
+	answered = false;
+	numIdx = 0;
+	
+	qData.goodAnswerCount = 0;
+	qData.badAnswerCount = 0;
+	showStat();
+	
+	shuffleArray(numbers1);
+	shuffleArray(numbers2);
+	
+	fullnumbers = [];
+	
+	let ii = 0;
+	for (i=0;i < numbers1.length;i++)
+		for(j=0; j < numbers2.length;j++)
+		{
+			if ((Math.floor(Math.random() * 2)) == 0) {
+			fullnumbers[ii] = { n1: numbers1[i], n2: numbers2[j] };
+			ii++;
+			}
+			else {
+		     fullnumbers[ii] = { n1: numbers2[j], n2: numbers1[i] };
+			ii++;
+			}
+		}
+		
+	shuffleArray(fullnumbers);
+	
+	for(i=0; i < 4;i++) {
+		btns[i].disabled = false;	
+    }
+	
+	document.getElementById("buttonNewTest").disabled = true;
+	nextQuestion();
+}
+
+function endTest() {
+	document.getElementById("buttonNext").disabled = true;
+	
+	for(i=0; i < 4;i++) {		
+		btns[i].innerHTML = '';		
+		btns[i].disabled = true;
+    }
+	
+	lblNumber1.innerHTML = '';
+	lblNumber2.innerHTML = '';
+	lblNumber3.innerHTML = '';
+	
+	document.getElementById("buttonNewTest").disabled = false;
+
+	
+	// alert("VÉGE");
+}
+
+function shuffleArray(array) {
+    for (var i = array.length - 1; i > 0; i--) {
+        var j = Math.floor(Math.random() * (i + 1));
+        var temp = array[i];
+        array[i] = array[j];
+        array[j] = temp;
+    }
+}
+
+function nextQuestion() {
+	answered = false;
+	
+	if (numIdx >= fullnumbers.length) {
+		endTest();
+		return;
+	}
+	
+	
+	qData.num1 = fullnumbers[numIdx].n1;
+	qData.num2 = fullnumbers[numIdx].n2;
+	numIdx++;
+	qData.goodanswer = qData.num1 * qData.num2;
+	
+	lblNumber1.innerHTML = qData.num1;
+	lblNumber2.innerHTML = qData.num2;
+	lblNumber3.innerHTML = '';
+  
+	let goodAnswerIndex = Math.floor(Math.random() * 4)
+
+	let answer = 0;
+	for(i=0; i < 4;i++) {
+		if (i == goodAnswerIndex)
+			answer = qData.num1 * qData.num2;
+		else
+		    answer = Math.floor(Math.random() * 100) + 1
+		
+		btns[i].innerHTML = answer;		
+    }
+
+	document.getElementById("column5").style.backgroundColor = "";
+	document.getElementById("buttonNext").disabled = true;
+}
+
+function answerBtuttonClick(btn) {
+	let answer = btn.innerHTML;
+	lblNumber3.innerHTML = answer;
+	
+	if (answer == qData.goodanswer) {
+		if (!answered)
+		   qData.goodAnswerCount++;
+		   
+		document.getElementById("column5").style.backgroundColor = "lightgreen";
+		playOK();
+	}
+	else {
+		if (!answered)
+		   qData.badAnswerCount++;
+		   
+		document.getElementById("column5").style.backgroundColor = "red";
+		playFail();
+	}
+	
+	answered = true;
+	document.getElementById("buttonNext").disabled = false;
+	
+	showStat();
+}
+
+function showStat() {
+	document.getElementById("lblStatGood").innerHTML = qData.goodAnswerCount;
+	document.getElementById("lblStatBad").innerHTML = qData.badAnswerCount;
+}
+
+function playOK() {
+  audio1.play();
+}
+
+function playFail() {
+  audio2.play();
+}
+
+</script>
+</html>
