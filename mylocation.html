@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPS másoló</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 500px;
+            margin: auto;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            box-sizing: border-box;
+        }
+
+        #status {
+            margin-top: 15px;
+            color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>GPS koordináta másolása</h2>
+
+    <input id="textInput"
+           type="text"
+           placeholder="Írj ide valamit">
+
+    <button onclick="copyLocation()">
+        GPS lekérése és másolás
+    </button>
+
+    <div id="status"></div>
+
+    <script>
+        async function copyLocation() {
+
+            const text = document.getElementById("textInput").value;
+            const status = document.getElementById("status");
+
+            if (!navigator.geolocation) {
+                status.innerText = "A geolocation nem támogatott.";
+                return;
+            }
+
+            navigator.geolocation.getCurrentPosition(
+                async (position) => {
+
+                    const lat = position.coords.latitude;
+                    const lon = position.coords.longitude;
+
+                    const result =
+                        text
+                        ? `${text}\t${lat}, ${lon}`
+                        : `${lat}, ${lon}`;
+
+                    try {
+                        await navigator.clipboard.writeText(result);
+                        status.innerText =
+                            "Vágólapra másolva: " + result;
+                    } catch (err) {
+                        status.innerText =
+                            "Sikertelen másolás.";
+                    }
+                },
+                (error) => {
+                    status.innerText =
+                        "Nem sikerült lekérni a GPS pozíciót.";
+                }
+            );
+        }
+    </script>
+
+</body>
+</html>
