@@ -40,6 +40,15 @@
 
     <div id="status"></div>
 
+    <textarea id="result"
+          rows="4"
+          style="width:100%; margin-top:10px;"
+          readonly>
+    </textarea>
+    
+<button onclick="copyResult()">Másolás</button>
+
+    
     <script>
         async function copyLocation() {
 
@@ -52,31 +61,46 @@
             }
 
             navigator.geolocation.getCurrentPosition(
-                async (position) => {
+    async (position) => {
 
-                    const lat = position.coords.latitude;
-                    const lon = position.coords.longitude;
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
 
-                    const result =
-                        text
-                        ? `${text}\t${lat}, ${lon}`
-                        : `${lat}, ${lon}`;
+        const result =
+            text
+            ? `${text}\t${lat},${lon}`
+            : `${lat},${lon}`;
 
-                    try {
-                        await navigator.clipboard.writeText(result);
-                        status.innerText =
-                            "Vágólapra másolva: " + result;
-                    } catch (err) {
-                        status.innerText =
-                            "Sikertelen másolás.";
-                    }
-                },
-                (error) => {
-                    status.innerText =
-                        "Nem sikerült lekérni a GPS pozíciót.";
-                }
-            );
+        document.getElementById("result").value = result;
+
+        try {
+            await navigator.clipboard.writeText(result);
+            status.innerText = "Vágólapra másolva.";
         }
+        catch (err) {
+            status.innerText =
+                "A vágólapra másolás nem sikerült, de a szöveg lent látható.";
+        }
+    },
+    (error) => {
+        status.innerText =
+            "Nem sikerült lekérni a GPS pozíciót.";
+    }
+);
+
+        }
+
+async function copyResult() {
+    const text = document.getElementById("result").value;
+
+    try {
+        await navigator.clipboard.writeText(text);
+        alert("Másolva.");
+    }
+    catch {
+        alert("A másolás nem sikerült.");
+    }
+}        
     </script>
 
 </body>
